@@ -1,0 +1,68 @@
+<!--
+  NOTAS:
+  Este componente esta utilizando las directivas genericas de Angular,
+  Por lo que no es necesario importar el modulo CommonModule para poder utilizar las directivas *ngIf.
+-->
+
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-semibold">Roles</h2>
+    <button class="btn btn-primary" (click)="goToCreate()">+ Nuevo Rol</button>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Lista de Roles</h2>
+  <div *ngIf="loading()" class="text-center">Cargando roles...</div>
+
+  <div *ngIf="!loading()">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Activo</th>
+            <th>Creado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!--
+            En este bloque se utiliza la directiva legacy *ngFor de Angular para iterar sobre la lista de roles y renderizar cada uno en la tabla.
+            Para optimizar el rendimiento y evitar renderizados innecesarios, se utiliza la función trackByRoleId a través de la propiedad trackBy.
+            Esta función permite a Angular identificar de manera eficiente cada elemento de la lista usando su id único, asegurando que solo se actualicen los elementos que realmente cambian.
+            Si los elementos no tuvieran un identificador único, se podría usar el índice o alguna otra propiedad repetible para el trackeo.
+          -->
+
+          <tr *ngFor="let role of roles(); trackBy: trackByRoleId">
+            <td>{{ role.name }}</td>
+            <td>{{ role.description }}</td>
+            <td>
+              <span class="badge" [class.badge-success]="role.isActive" [class.badge-error]="!role.isActive">
+                {{ role.isActive ? 'Sí' : 'No' }}
+              </span>
+            </td>
+
+            <td>{{ role.createdAt | date:'short' }}</td>
+            <td class="space-x-2">
+              <button class="btn btn-sm btn-info" (click)="goToEdit(role.id)">Editar</button>
+              <button class="btn btn-sm btn-error" (click)="deleteRole(role.id)">Eliminar</button>
+              <button class="btn btn-sm" [ngClass]="role.isActive ? 'btn-warning' : 'btn-primary'"
+                (click)="toggleRoleActiveStatus(role)">
+                {{ role.isActive ? 'Desactivar' : 'Activar' }}
+              </button>
+              <button class="btn btn-sm btn-outline btn-primary" (click)="goToAsignarPermisos(role.id)">Asignar
+                Permisos</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-between items-center mt-4">
+      <button class="btn" (click)="changePage(-1)" [disabled]="currentPage() === 1">Anterior</button>
+      <span>Página {{ currentPage() }} de {{ totalPages() }}</span>
+      <button class="btn" (click)="changePage(1)" [disabled]="currentPage() === totalPages()">Siguiente</button>
+    </div>
+  </div>
+</div>

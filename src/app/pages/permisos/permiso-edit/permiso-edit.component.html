@@ -1,0 +1,13 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-semibold">Permisos</h2>
+    <a class="btn btn-primary" [routerLink]="['/permisos']">Regresar</a>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Editar Permiso</h2>
+  @if(permission()){
+  <app-permiso-form [permission]="permission()" (formSubmit)="updatePermission($event)"></app-permiso-form>
+  } @else {
+  <p>Cargando...</p>
+  }
+</div>

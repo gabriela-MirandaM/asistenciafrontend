@@ -1,0 +1,15 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-semibold">Roles</h2>
+    <a class="btn btn-primary" [routerLink]="['/roles']">Regresar</a>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Editar Roles</h2>
+  <ng-container *ngIf="role(); else loading">
+    <app-role-form [role]="role()" (formSubmit)="updateRole($event)"></app-role-form>
+  </ng-container>
+  <ng-template #loading>
+    <p>Cargando...</p>
+  </ng-template>
+
+</div>

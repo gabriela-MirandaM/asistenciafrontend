@@ -1,0 +1,26 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-bold mb-4">Roles</h2>
+    <a class="btn btn-primary" [routerLink]="['/roles']" type="button">Regresar</a>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Asignar Permisos a {{ role()?.name }}</h2>
+  <form (ngSubmit)="guardarPermisos()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      @for (permission of permissions(); track permission.id) {
+      <div class="form-control">
+        <label class="label cursor-pointer">
+          <input type="checkbox" class="checkbox" [checked]="selectedPermissionIds().has(permission.id)"
+            (change)="toggleSeleccion(permission.id)" />
+          <span class="label-text ml-2">{{ permission.name }}</span>
+        </label>
+      </div>
+      }
+    </div>
+
+    <div class="mt-6">
+      <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+  </form>
+
+</div>

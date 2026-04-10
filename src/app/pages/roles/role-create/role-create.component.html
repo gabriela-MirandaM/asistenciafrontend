@@ -1,0 +1,10 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-semibold">Roles</h2>
+    <a class="btn btn-primary" [routerLink]="['/roles']">Regresar</a>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Crear Rol</h2>
+  <app-role-form (formSubmit)="createRole($event)"></app-role-form>
+
+</div>

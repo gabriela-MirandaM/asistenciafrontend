@@ -1,0 +1,31 @@
+<form [formGroup]="form" class="space-y-4">
+
+  <div class="form-control w-full">
+    <label for="name" class="label">
+      <span class="label-text">Nombre</span>
+    </label>
+    <input id="name" type="text" name="name" placeholder="Nombre" class="input input-bordered w-full"
+      formControlName="name" required />
+    <div *ngIf="nameError()" class="mt-1 text-sm text-error">El nombre es obligatorio</div>
+  </div>
+
+  <div class="form-control w-full">
+    <label for="description" class="label">
+      <span class="label-text">Descripción</span>
+    </label>
+    <input id="description" type="text" name="description" placeholder="Descripción" class="input input-bordered w-full"
+      formControlName="description" required />
+    <div *ngIf="descriptionError()" class="mt-1 text-sm text-error">La descripción es obligatoria</div>
+  </div>
+
+  <div class="form-control">
+    <label class="label cursor-pointer">
+      <span class="label-text">¿Rol activo?</span>
+      <input type="checkbox" name="isActive" class="checkbox" formControlName="isActive" />
+    </label>
+  </div>
+
+  <div class="flex justify-end pt-2">
+    <button type="submit" class="btn btn-primary" (click)="onSubmit()">Guardar</button>
+  </div>
+</form>

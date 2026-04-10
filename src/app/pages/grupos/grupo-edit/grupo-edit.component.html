@@ -1,0 +1,13 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-semibold">Grupos</h2>
+    <a class="btn btn-primary" [routerLink]="['/grupos']">Regresar</a>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Editar Grupos</h2>
+  @if(group()){
+  <app-grupo-form [group]="group()" (formSubmit)="updateGroup($event)"></app-grupo-form>
+  } @else {
+  <p>Cargando...</p>
+  }
+</div>

@@ -1,0 +1,10 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-semibold">Permisos</h2>
+    <a class="btn btn-primary" [routerLink]="['/permisos']">Regresar</a>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Crear Permiso</h2>
+  <app-permiso-form (formSubmit)="createPermission($event)"></app-permiso-form>
+
+</div>

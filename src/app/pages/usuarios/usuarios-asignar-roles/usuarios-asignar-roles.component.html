@@ -1,0 +1,26 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-bold mb-4">Usuarios</h2>
+    <a class="btn btn-primary" [routerLink]="['/usuarios']" type="button">Regresar</a>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Asignar Roles a {{ user()?.username }}</h2>
+  <form (ngSubmit)="guardarRoles()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      @for (rol of roles(); track rol.id) {
+      <div class="form-control">
+        <label class="label cursor-pointer">
+          <input type="checkbox" class="checkbox" [checked]="selectedRoleIds().has(rol.id)"
+            (change)="toggleSeleccion(rol.id)" />
+          <span class="label-text ml-2">{{ rol.name }}</span>
+        </label>
+      </div>
+      }
+    </div>
+
+    <div class="mt-6">
+      <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+  </form>
+
+</div>

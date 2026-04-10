@@ -1,0 +1,46 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+
+  <div class="form-control w-full">
+    <label for="username" class="label">
+      <span class="label-text">Username</span>
+    </label>
+    <input id="username" type="text" name="username" placeholder="Username" class="input input-bordered w-full"
+      formControlName="username" required />
+    @if (usernameError()) {
+    <div class="mt-1 text-sm text-error">El nombre de usuario es obligatorio</div>
+    }
+  </div>
+
+  <div class="form-control w-full">
+    <label for="email" class="label">
+      <span class="label-text">Email</span>
+    </label>
+    <input id="email" type="email" name="email" placeholder="Email" class="input input-bordered w-full"
+      formControlName="email" required />
+    @if (emailError()) {
+    <div class="mt-1 text-sm text-error">Email inválido</div>
+    }
+  </div>
+
+  <div class="form-control w-full">
+    <label for="password" class="label">
+      <span class="label-text">Password</span>
+    </label>
+    <input id="password" type="password" name="password" placeholder="Password" class="input input-bordered w-full"
+      formControlName="password" />
+    @if (passwordError()) {
+    <div class="mt-1 text-sm text-error">El password es obligatorio</div>
+    }
+  </div>
+
+  <div class="form-control">
+    <label class="label cursor-pointer">
+      <span class="label-text">Usuario activo?</span>
+      <input type="checkbox" name="isActive" class="checkbox" formControlName="isActive" />
+    </label>
+  </div>
+
+  <div class="flex justify-end pt-2">
+    <button class="btn btn-primary" type="submit">Guardar</button>
+  </div>
+</form>

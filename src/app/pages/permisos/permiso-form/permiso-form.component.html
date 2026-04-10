@@ -1,0 +1,52 @@
+<form [formGroup]="form" class="space-y-4">
+
+  <div class="form-control w-full">
+    <label for="name" class="label">
+      <span class="label-text">Nombre</span>
+    </label>
+    <input id="name" type="text" name="name" placeholder="Nombre" class="input input-bordered w-full"
+      formControlName="name" required />
+    @if(nameError()){
+    <div class="mt-1 text-sm text-error">El nombre es obligatorio</div>
+    }
+  </div>
+
+  <div class="form-control w-full">
+    <label for="description" class="label">
+      <span class="label-text">Descripción</span>
+    </label>
+    <input id="description" type="text" name="description" placeholder="Descripción" class="input input-bordered w-full"
+      formControlName="description" required />
+    @if(descriptionError()){
+    <div class="mt-1 text-sm text-error">La descripción es obligatoria</div>
+    }
+  </div>
+
+  <!-- TODO: Agregar Select de Grupos, se me ocurre llamar a gruposActivos y de ahi construir el select. bindearlo a groupId y con ello estaria listo. -->
+  <div class="form-control w-full">
+    <label for="groupId" class="label">
+      <span class="label-text">Grupo</span>
+    </label>
+    <select id="groupId" class="select select-bordered w-full" formControlName="groupId" required>
+      <option [ngValue]="null" disabled selected>Selecciona un grupo</option>
+      @for (grupo of gruposActivos(); track grupo.id) {
+      <option [ngValue]="grupo.id">{{ grupo.name }} - {{ grupo.description }}</option>
+      }
+    </select>
+    @if (groupIdError()) {
+    <div class="mt-1 text-sm text-error">Debe seleccionar un grupo</div>
+    }
+
+  </div>
+
+  <div class="form-control">
+    <label class="label cursor-pointer">
+      <span class="label-text">¿Permiso activo?</span>
+      <input type="checkbox" name="isActive" class="checkbox" formControlName="isActive" />
+    </label>
+  </div>
+
+  <div class="flex justify-end pt-2">
+    <button type="submit" class="btn btn-primary" (click)="onSubmit()">Guardar</button>
+  </div>
+</form>

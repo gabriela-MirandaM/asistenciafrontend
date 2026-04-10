@@ -1,0 +1,57 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-semibold">Grupos</h2>
+    <button class="btn btn-primary" (click)="goToCreate()">+ Nuevo Grupo</button>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Lista de Grupos</h2>
+
+  @if (loading()) {
+  <div class="text-center">Cargando grupos...</div>
+  } @else {
+  <div class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Activo</th>
+          <th>Creado</th>
+          <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (group of groups(); track group.id) {
+        <tr>
+          <td>{{ group.name }}</td>
+          <td>{{ group.description }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="group.isActive" [class.badge-error]="!group.isActive">
+              {{ group.isActive ? 'Sí' : 'No' }}
+            </span>
+          </td>
+          <td>{{ group.createdAt | date:'short' }}</td>
+          <td class="space-x-2">
+            <button class="btn btn-sm btn-info" (click)="goToEdit(group.id)">Editar</button>
+            <button class="btn btn-sm btn-error" (click)="deleteGroup(group.id)">Eliminar</button>
+            @if(group.isActive){
+            <button class="btn btn-sm btn-warning" (click)="toggleGrupoActivoStatus(group)">Desactivar</button>
+            } @if(!group.isActive) {
+            <button class="btn btn-sm btn-primary" (click)="toggleGrupoActivoStatus(group)">Activar</button>
+            }
+          </td>
+
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex justify-between items-center mt-4">
+    <button class="btn" (click)="changePage(-1)" [disabled]="currentPage() === 1">Anterior</button>
+    <span>Página {{ currentPage() }} de {{ totalPages() }}</span>
+    <button class="btn" (click)="changePage(1)" [disabled]="currentPage() === totalPages()">Siguiente</button>
+  </div>
+
+  }
+</div>

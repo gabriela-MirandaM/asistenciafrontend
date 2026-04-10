@@ -1,0 +1,58 @@
+<div class="p-4">
+  <div class="flex justify-between mb-4 items-center">
+    <h2 class="text-2xl font-semibold">Permisos</h2>
+    <button class="btn btn-primary" (click)="goToCreate()">+ Nuevo Permiso</button>
+  </div>
+
+  <h2 class="text-xl font-bold mb-4">Lista de Permisos</h2>
+
+  @if (loading()) {
+  <div class="text-center">Cargando permisos...</div>
+  } @else {
+  <div class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Activo</th>
+          <th>Creado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (permission of permissions(); track permission.id) {
+        <tr>
+          <td>{{ permission.name }}</td>
+          <td>{{ permission.description }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="permission.isActive" [class.badge-error]="!permission.isActive">
+              {{ permission.isActive ? 'Sí' : 'No' }}
+            </span>
+          </td>
+          <td>{{ permission.createdAt | date:'short' }}</td>
+          <td class="space-x-2">
+            <button class="btn btn-sm btn-info" (click)="goToEdit(permission.id)">Editar</button>
+            <button class="btn btn-sm btn-error" (click)="deletePermission(permission.id)">Eliminar</button>
+            @if(permission.isActive){
+            <button class="btn btn-sm btn-warning"
+              (click)="togglePermissionActivoStatus(permission)">Desactivar</button>
+            } @if(!permission.isActive) {
+            <button class="btn btn-sm btn-primary" (click)="togglePermissionActivoStatus(permission)">Activar</button>
+            }
+          </td>
+
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex justify-between items-center mt-4">
+    <button class="btn" (click)="changePage(-1)" [disabled]="currentPage() === 1">Anterior</button>
+    <span>Página {{ currentPage() }} de {{ totalPages() }}</span>
+    <button class="btn" (click)="changePage(1)" [disabled]="currentPage() === totalPages()">Siguiente</button>
+  </div>
+
+  }
+</div>
