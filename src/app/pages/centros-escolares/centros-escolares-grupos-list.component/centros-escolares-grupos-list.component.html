@@ -1,1 +1,93 @@
 <p>centros-escolares-grupos-list.component works!</p>
+<div class="p-6">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Grupos</h1>
+    <p class="text-sm opacity-70">
+      Centro Escolar: {{ centroSeleccionado()?.nombre }}
+    </p>
+  </div>
+
+  <!-- Lista de grupos -->
+  <div class="space-y-4">
+
+    @for (grupo of grupos(); track grupo.id) {
+    <div class="border border-base-300 rounded-box">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 bg-base-200 rounded-t-box">
+        <div class="font-semibold">
+          {{ grupo.nombre }}
+        </div>
+
+        <button class="btn btn-sm btn-primary" (click)="toggleGrupo(grupo.id)">
+          {{ grupoExpandido() === grupo.id ? 'Ocultar' : 'Ver asistencia' }}
+        </button>
+      </div>
+
+      <!-- Contenido -->
+      @if (grupoExpandido() === grupo.id) {
+      <div class="p-4">
+
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+
+            <thead>
+              <tr>
+                <th>Alumno</th>
+
+                @for (dia of dias(); track dia) {
+                <th class="text-center">
+                  {{ diaLabel(dia) }}
+                </th>
+                }
+
+              </tr>
+            </thead>
+
+            <tbody>
+
+              @for (alumno of alumnosPorGrupo(grupo.id); track alumno.id) {
+              <tr>
+
+                <td class="font-medium">
+                  {{ alumno.nombre }} {{ alumno.apellido }}
+                </td>
+
+                @for (dia of dias(); track dia) {
+                <td class="text-center">
+
+                  <!-- Asistencia -->
+                  @if (isAsistio(alumno.id, dia)) {
+                  <span class="badge badge-success">✔</span>
+                  } @else {
+                  <span class="badge badge-ghost">✖</span>
+                  }
+
+                  <!-- Observación -->
+                  @if (!isAsistio(alumno.id, dia) && observacion(alumno.id, dia)) {
+                  <span class="ml-1 cursor-help" [title]="observacion(alumno.id, dia)">
+                  </span>
+                  }
+
+                </td>
+                }
+
+              </tr>
+              }
+
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+      }
+
+    </div>
+    }
+
+  </div>
+
+</div>
