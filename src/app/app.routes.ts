@@ -18,6 +18,9 @@ import { PermisosListComponent } from './pages/permisos/permisos-list/permisos-l
 import { PermisoCreateComponent } from './pages/permisos/permiso-create/permiso-create.component';
 import { PermisoEditComponent } from './pages/permisos/permiso-edit/permiso-edit.component';
 import { RolesAsignarPermisosComponent } from './pages/roles/roles-asignar-permisos/roles-asignar-permisos.component';
+import { AsistenciaListComponent } from './pages/asistencia/asistencia-list.component/asistencia-list.component';
+import { CentrosEscolaresListComponent } from './pages/centros-escolares/centros-escolares-list.component/centros-escolares-list.component';
+import { CentrosEscolaresGruposListComponent } from './pages/centros-escolares/centros-escolares-grupos-list.component/centros-escolares-grupos-list.component';
 
 export const routes: Routes = [
   {
@@ -40,6 +43,9 @@ export const routes: Routes = [
       { path: 'permisos', component: PermisosListComponent },
       { path: 'permisos/create', component: PermisoCreateComponent },
       { path: 'permisos/edit/:id', component: PermisoEditComponent },
+      { path: 'asistencia', component: AsistenciaListComponent },
+      { path: 'centros-escolares', component: CentrosEscolaresListComponent },
+      { path: 'centros-escolares/:id/grupos', component: CentrosEscolaresGruposListComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

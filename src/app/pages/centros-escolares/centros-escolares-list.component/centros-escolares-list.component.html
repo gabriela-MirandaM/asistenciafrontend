@@ -1,0 +1,75 @@
+<p>centros-escolares-list.component works!</p>
+
+<div class="p-6">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Centros Escolares</h1>
+    <p class="text-sm opacity-70">
+      Seleccione un centro escolar para ver sus grupos y asistencia
+    </p>
+  </div>
+
+  <!-- Buscador -->
+  <div class="mb-6 flex gap-2">
+    <input type="text" placeholder="Buscar por nombre o código..." class="input input-bordered w-full max-w-md"
+      [value]="searchTerm()" (input)="setSearchTerm($any($event.target).value)" />
+
+    <button class="btn btn-outline" (click)="limpiarBusqueda()">
+      Limpiar
+    </button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="overflow-x-auto rounded-box border border-base-300">
+    <table class="table table-zebra">
+
+      <thead>
+        <tr class="bg-base-200">
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Dirección</th>
+          <th class="text-center">Acción</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        @if (centrosFiltrados().length === 0) {
+        <tr>
+          <td colspan="4" class="text-center opacity-70">
+            No se encontraron resultados
+          </td>
+        </tr>
+        }
+
+        @for (centro of centrosFiltrados(); track centro.id) {
+        <tr class="hover">
+
+          <td class="font-mono">
+            {{ centro.codigo }}
+          </td>
+
+          <td class="font-medium">
+            {{ centro.nombre }}
+          </td>
+
+          <td>
+            {{ centro.direccion }}
+          </td>
+
+          <td class="text-center">
+            <button class="btn btn-sm btn-primary" (click)="seleccionarCentro(centro)">
+              Ver grupos
+            </button>
+          </td>
+
+        </tr>
+        }
+
+      </tbody>
+
+    </table>
+  </div>
+
+</div>
