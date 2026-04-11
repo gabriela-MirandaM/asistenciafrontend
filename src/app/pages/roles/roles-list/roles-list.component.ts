@@ -99,9 +99,4 @@ export class RolesListComponent {
   trackByRoleId(index: number, role: Role) {
     return role.id;
   }
-
-  // Pantalla para asignar permisos a un rol
-  goToAsignarPermisos(id: string) {
-    this.router.navigate(['roles', id, 'permisos']);
-  }
 }

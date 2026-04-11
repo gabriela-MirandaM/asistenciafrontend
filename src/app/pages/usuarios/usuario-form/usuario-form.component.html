@@ -12,6 +12,17 @@
   </div>
 
   <div class="form-control w-full">
+    <label for="nombre" class="label">
+      <span class="label-text">Nombre</span>
+    </label>
+    <input id="nombre" type="text" name="nombre" placeholder="Nombre" class="input input-bordered w-full"
+      formControlName="nombre" required />
+    @if (nombreError()) {
+    <div class="mt-1 text-sm text-error">El nombre es obligatorio</div>
+    }
+  </div>
+
+  <div class="form-control w-full">
     <label for="email" class="label">
       <span class="label-text">Email</span>
     </label>
@@ -30,6 +41,21 @@
       formControlName="password" />
     @if (passwordError()) {
     <div class="mt-1 text-sm text-error">El password es obligatorio</div>
+    }
+  </div>
+
+  <div class="form-control w-full">
+    <label for="id_rol" class="label">
+      <span class="label-text">Rol</span>
+    </label>
+    <select class="select select-bordered w-full" formControlName="id_rol" id="id_rol" name="id_rol" placeholder="Selecciona un Rol" required>
+      <option value="" disabled selected>Selecciona un Rol</option>
+      @for (rol of roles(); track rol.id) {
+        <option [value]="rol.id" [selected]="user() && user()?.role?.id === rol.id">{{ rol.description }}</option>
+      }
+    </select>
+    @if (idRoleError()) {
+    <div class="mt-1 text-sm text-error">El rol es obligatorio</div>
     }
   </div>
 

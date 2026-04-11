@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { signal } from '@angular/core';
 
 @Component({
-  selector: 'app-centros-escolares-grupos-list.component',
+  selector: 'app-centros-escolares-grupos-list',
   imports: [],
   templateUrl: './centros-escolares-grupos-list.component.html',
 })
