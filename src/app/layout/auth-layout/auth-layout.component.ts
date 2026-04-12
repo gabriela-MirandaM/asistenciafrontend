@@ -29,7 +29,29 @@ export class AuthLayoutComponent {
 
     this.authService.login(username!, password!).subscribe({
       next: () => {
-        this.router.navigate(['/']); // o la ruta que tengas
+        // Decodificar el token para obtener el rol y redirigir según corresponda
+        const token = this.authService.getAccessToken();
+        if (token) {
+          const decoded = this.authService.decodeAccessToken(token);
+          if (decoded) {
+            switch (decoded.role) {
+              case 'ADMINISTRADOR':
+                this.router.navigate(['/dashboard']);
+                break;
+              case 'PROFESOR':
+                this.router.navigate(['/asistencia']);
+                break;
+              case 'SUPERVISOR':
+                this.router.navigate(['/centros-escolares']);
+                break;
+              default:
+                this.router.navigate(['/dashboard']); // fallback
+                break;
+            }
+          } else {
+            this.router.navigate(['/dashboard']); // fallback si no se puede decodificar
+          }
+        }
       },
       error: (err) => {
         this.loginError.set('Credenciales inválidas');

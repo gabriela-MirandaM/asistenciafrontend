@@ -109,4 +109,14 @@ export class AuthService {
       return null;
     }
   }
+
+  getUserRole(): string | null {
+    const token = this.getAccessToken();
+    if (!token) {
+      return null;
+    }
+
+    const decoded = this.decodeAccessToken(token);
+    return decoded?.role ?? null;
+  }
 }
