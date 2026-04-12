@@ -16,6 +16,14 @@ export class GruposService {
     return this.http.get<any>(`${this.baseUrl}/api/grupos/${grupoId}`);
   }
 
+  getAsistenciaPorGrupo(grupoId: string, fecha?: string): Observable<any[]> {
+    let url = `${this.baseUrl}/api/grupos/${grupoId}/asistencia`;
+    if (fecha) {
+      url += `?fecha=${fecha}`;
+    }
+    return this.http.get<any[]>(url);
+  }
+
   guardarAsistencia(grupoId: string, data: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/api/grupos/${grupoId}/asistencia`, data);
   }

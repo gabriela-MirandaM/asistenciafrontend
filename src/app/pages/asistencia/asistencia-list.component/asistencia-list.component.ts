@@ -94,8 +94,7 @@ export class AsistenciaListComponent implements OnInit {
       return;
     }
     this.step.set('list');
-    this.loadAlumnos(this.selectedGrupoId()!);
-    this.loadAsistencia();
+    this.loadAsistenciaPorGrupo();
   }
 
   volverASeleccionFecha() {
@@ -128,64 +127,42 @@ export class AsistenciaListComponent implements OnInit {
     }
   }
 
-  private loadAlumnos(grupoId: number) {
-    this.service.getAlumnosPorGrupo(String(grupoId)).subscribe({
+  private loadAsistenciaPorGrupo() {
+    const grupoId = this.selectedGrupoId();
+    const fecha = this.selectedDate();
+    if (!grupoId) {
+      this.notificationService.show('error', 'No se encontró el grupo asignado.');
+      return;
+    }
+
+    this.gruposService.getAsistenciaPorGrupo(String(grupoId), fecha).subscribe({
       next: alumnos => {
         this.alumnos.set(alumnos ?? []);
+        this.mapAsistenciaDesdeAlumnos(alumnos ?? []);
       },
       error: () => {
-        this.notificationService.show('error', 'No se pudieron cargar los alumnos del grupo');
+        this.notificationService.show('error', 'No se pudieron cargar los alumnos y asistencias del grupo');
       }
     });
   }
 
-  private loadAsistencia() {
-    if (!this.selectedDate()) {
-      return;
-    }
-
-    const fecha = this.selectedDate();
-    const centroId = this.selectedCentroId();
-    if (!centroId) {
-      this.notificationService.show('error', 'No se encontró el centro escolar asignado.');
-      return;
-    }
-
-    this.service.getAsistenciasPorCentro(centroId, fecha, fecha).subscribe({
-      next: entries => {
-        this.mapAsistencias(entries ?? []);
-      },
-      error: () => {
-        this.notificationService.show('error', 'No se pudieron cargar las asistencias');
-      }
-    });
-  }
-
-  private mapAsistencias(entries: any[]) {
+  private mapAsistenciaDesdeAlumnos(alumnos: any[]) {
     const asistencia: Record<number, Record<string, boolean>> = {};
     const observaciones: Record<number, string> = {};
-    const grupoId = this.selectedGrupoId();
+    const fecha = this.selectedDate();
 
-    entries.forEach(entry => {
-      const alumnoId = entry.alumno?.id ?? entry.alumnoId ?? entry.alumno_id;
-      const fecha = entry.fecha ?? entry.date ?? entry.dia;
-      const presente = entry.presente ?? entry.asistio ?? entry.asistencia ?? entry.present ?? false;
-      const observacion = entry.observacion ?? entry.observaciones ?? entry.observacion_detalle;
-      const entryGrupoId = entry.grupoId ?? entry.idGrupo ?? entry.grupo?.id;
+    alumnos.forEach(alumno => {
+      const alumnoId = Number(alumno.id);
+      const asistio = alumno.asistio ?? false;
+      const observacion = alumno.observaciones ?? '';
 
-      if (alumnoId == null || !fecha) {
-        return;
-      }
+      if (alumnoId && fecha) {
+        asistencia[alumnoId] ??= {};
+        asistencia[alumnoId][fecha] = !!asistio;
 
-      if (grupoId != null && entryGrupoId != null && Number(entryGrupoId) !== grupoId) {
-        return;
-      }
-
-      asistencia[alumnoId] ??= {};
-      asistencia[alumnoId][fecha] = !!presente;
-
-      if (observacion) {
-        observaciones[alumnoId] = String(observacion);
+        if (observacion) {
+          observaciones[alumnoId] = String(observacion);
+        }
       }
     });
 
@@ -264,8 +241,11 @@ export class AsistenciaListComponent implements OnInit {
       }))
     };
 
+    console.log('Payload a enviar:', payload); // Debug
+
     this.gruposService.guardarAsistencia(String(grupoId), payload).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('Respuesta del servidor:', response); // Debug
         this.loadingService.hide();
         this.notificationService.show('success', 'Asistencia guardada exitosamente');
         // Limpiar y volver al selector de fecha
@@ -274,8 +254,8 @@ export class AsistenciaListComponent implements OnInit {
         }, 1000);
       },
       error: (err) => {
+        console.error('Error completo al guardar asistencia:', err); // Debug más detallado
         this.loadingService.hide();
-        console.error('Error al guardar asistencia:', err);
         this.notificationService.show('error', 'Error al guardar la asistencia. Intente nuevamente.');
       }
     });
