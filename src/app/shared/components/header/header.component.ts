@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, output } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -8,6 +8,8 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class HeaderComponent implements OnInit {
   private authService = inject(AuthService);
+
+  toggleSidebar = output<void>();
 
   ngOnInit() {
     this.loadTheme();
@@ -29,6 +31,10 @@ export class HeaderComponent implements OnInit {
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     html.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
+  }
+
+  onToggleSidebar() {
+    this.toggleSidebar.emit();
   }
 
   logout() {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from "../../shared/components/header/header.component";
 import { SidebarComponent } from "../../shared/components/sidebar/sidebar.component";
@@ -9,4 +9,10 @@ import { FooterComponent } from "../../shared/components/footer/footer.component
   imports: [RouterOutlet, HeaderComponent, SidebarComponent, FooterComponent],
   templateUrl: './main-layout.component.html',
 })
-export class MainLayoutComponent { }
+export class MainLayoutComponent {
+  sidebarOpen = signal(false);
+
+  toggleSidebar() {
+    this.sidebarOpen.update(open => !open);
+  }
+}
