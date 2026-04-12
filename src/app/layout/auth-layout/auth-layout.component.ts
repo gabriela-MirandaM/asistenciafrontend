@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-auth-layout',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './auth-layout.component.html',
 })
 export class AuthLayoutComponent {
@@ -24,9 +24,15 @@ export class AuthLayoutComponent {
   });
 
   login() {
-    const { username, password } = this.form.value;
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      // Marcar todos los campos como touched para mostrar los errores
+      Object.keys(this.form.controls).forEach(key => {
+        this.form.get(key)?.markAsTouched();
+      });
+      return;
+    }
 
+    const { username, password } = this.form.value;
     this.authService.login(username!, password!).subscribe({
       next: () => {
         // Decodificar el token para obtener el rol y redirigir según corresponda
