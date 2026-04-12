@@ -10,6 +10,14 @@
     </p>
   </div>
 
+  @if (loading()) {
+  <div class="alert alert-info mb-4">Cargando centros escolares...</div>
+  }
+
+  @if (error()) {
+  <div class="alert alert-error mb-4">{{ error() }}</div>
+  }
+
   <!-- Buscador -->
   <div class="mb-6 flex gap-2">
     <input type="text" placeholder="Buscar por nombre o código..." class="input input-bordered w-full max-w-md"

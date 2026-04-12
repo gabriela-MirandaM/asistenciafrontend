@@ -19,15 +19,15 @@ export class AuthLayoutComponent {
   loginError = signal<string | null>(null);
 
   form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    username: ['', Validators.required],
     password: ['', Validators.required],
   });
 
   login() {
-    const { email, password } = this.form.value;
+    const { username, password } = this.form.value;
     if (this.form.invalid) return;
 
-    this.authService.login(email!, password!).subscribe({
+    this.authService.login(username!, password!).subscribe({
       next: () => {
         this.router.navigate(['/']); // o la ruta que tengas
       },

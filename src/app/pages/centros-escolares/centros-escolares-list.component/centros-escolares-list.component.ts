@@ -1,32 +1,37 @@
-import { Component } from '@angular/core';
-import { signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import { CentrosEscolaresService } from '../../../core/services/centros-escolares.service';
 
 @Component({
   selector: 'app-centros-escolares-list',
   imports: [],
   templateUrl: './centros-escolares-list.component.html',
 })
-export class CentrosEscolaresListComponent {
+export class CentrosEscolaresListComponent implements OnInit {
+  private router = inject(Router);
+  private service = inject(CentrosEscolaresService);
 
-  constructor(private router: Router,){}
-
-  centros = signal([
-    {
-      id: 1,
-      codigo: '11011',
-      nombre: 'Centro Escolar El Manguito',
-      direccion: 'Cantón El Manguito'
-    },
-    {
-      id: 2,
-      codigo: '11012',
-      nombre: 'Centro Escolar San José',
-      direccion: 'San Salvador'
-    }
-  ]);
-
+  centros = signal<any[]>([]);
   searchTerm = signal('');
+  loading = signal(false);
+  error = signal<string | null>(null);
+
+  centrosFiltrados = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+
+    if (!term) {
+      return this.centros();
+    }
+
+    return this.centros().filter(c =>
+      String(c.nombre).toLowerCase().includes(term) ||
+      String(c.codigo).toLowerCase().includes(term)
+    );
+  });
+
+  ngOnInit() {
+    this.loadCentrosEscolares();
+  }
 
   setSearchTerm(value: string) {
     this.searchTerm.set(value);
@@ -36,22 +41,28 @@ export class CentrosEscolaresListComponent {
     this.searchTerm.set('');
   }
 
-  centrosFiltrados = computed(() => {
-    const term = this.searchTerm().toLowerCase();
+  private loadCentrosEscolares() {
+    this.loading.set(true);
+    this.error.set(null);
 
-    if (!term) return this.centros();
+    this.service.getCentrosEscolares(1, 50, 'id', 'asc', '').subscribe({
+      next: response => {
+        const centros = Array.isArray(response)
+          ? response
+          : response?.data ?? response?.centros ?? [];
 
-    return this.centros().filter(c =>
-      c.nombre.toLowerCase().includes(term) ||
-      c.codigo.includes(term)
-    );
-  });
+        this.centros.set(centros);
+      },
+      error: () => {
+        this.error.set('No se pudieron cargar los centros escolares');
+      },
+      complete: () => {
+        this.loading.set(false);
+      }
+    });
+  }
 
   seleccionarCentro(centro: any) {
-    console.log('Centro seleccionado:', centro);
-
-    // luego:
-    // navegar a grupos o cargar grupos
-    this.router.navigate([`/centros-escolares/${centro.id}/grupos/`]);
+    this.router.navigate([`/centros-escolares/${centro.id}/grupos`]);
   }
 }

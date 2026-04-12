@@ -3,82 +3,88 @@
     <h2 class="text-2xl font-semibold">Asistencia</h2>
   </div>
 
-  <h2 class="text-xl font-bold mb-4">Registrar Asistencia</h2>
-  <input type="date" class="input input-bordered w-full max-w-xs" />
-  <button class="btn btn-primary">Seleccionar</button>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div>
+      <label class="label"><span class="label-text">Centro asignado</span></label>
+      <div class="input input-bordered w-full bg-base-100">{{ selectedCentroNombre() || 'No disponible' }}</div>
+    </div>
+    <div>
+      <label class="label"><span class="label-text">Grupo asignado</span></label>
+      <div class="input input-bordered w-full bg-base-100">{{ selectedGrupoNombre() || 'No disponible' }}</div>
+    </div>
+  </div>
+
+  @if (loading()) {
+  <div class="alert alert-info mb-4">Cargando datos de asistencia...</div>
+  }
+
+  @if (error()) {
+  <div class="alert alert-error mb-4">{{ error() }}</div>
+  }
 
   <div class="p-6">
 
-    <!-- Header -->
     <div class="mb-6 flex flex-wrap items-center gap-4">
       <div>
         <h1 class="text-2xl font-bold">Control de Asistencia</h1>
         <p class="text-sm opacity-70">
-          {{ centroEscolar() }} - {{ grupo() }}
+          {{ selectedCentroNombre() || 'Centro no seleccionado' }} - {{ selectedGrupoNombre() || 'Grupo no seleccionado' }}
         </p>
         <p class="text-sm font-semibold">
-          Semana: {{ semanaLabel() }}
+          Fecha: {{ semanaLabel() }}
         </p>
       </div>
 
       <div class="ml-auto flex gap-2">
-        <button class="btn btn-primary" (click)="guardar()">Guardar</button>
+        <button class="btn btn-primary" (click)="guardar()" [disabled]="!selectedGrupoId()">Guardar</button>
         <button class="btn btn-outline" (click)="cancelar()">Cancelar</button>
       </div>
     </div>
 
-    <!-- Tabla -->
+    @if (selectedGrupoId()) {
     <div class="overflow-x-auto rounded-box border border-base-300">
       <table class="table table-zebra table-pin-rows table-pin-cols">
 
-        <!-- Header -->
         <thead>
           <tr class="bg-base-200">
             <th class="w-64">Alumno</th>
 
             @for (dia of dias(); track dia) {
-            <th class="text-center">
-              {{ diaLabel(dia) }}
-            </th>
+            <th class="text-center">{{ diaLabel(dia) }}</th>
             }
 
             <th class="w-72">Observaciones</th>
           </tr>
         </thead>
 
-        <!-- Body -->
         <tbody>
-
-          @for (alumno of alumnos(); track alumno.id) {
+          @if (alumnos().length === 0) {
           <tr>
-
-            <!-- Nombre -->
-            <td class="font-medium">
-              {{ alumno.nombre }} {{ alumno.apellido }}
+            <td [attr.colspan]="dias().length + 2" class="text-center opacity-70">
+              No hay alumnos para este grupo.
             </td>
-
-            <!-- Días -->
-            @for (dia of dias(); track dia) {
-            <td class="text-center cursor-pointer" (click)="toggleAsistencia(alumno.id, dia)">
-              <input type="checkbox" class="checkbox checkbox-success pointer-events-none"
-                [checked]="isAsistio(alumno.id, dia)" />
-            </td>
-            }
-
-            <!-- Observaciones -->
-            <td>
-              <input type="text" placeholder="Observación..." class="input input-bordered input-sm w-full"
-                [value]="observacion(alumno.id)" (input)="setObservacion(alumno.id, $any($event.target).value)" />
-            </td>
-
           </tr>
           }
 
-        </tbody>
+          @for (alumno of alumnos(); track alumno.id) {
+          <tr>
+            <td class="font-medium">{{ alumno.nombre }} {{ alumno.apellido }}</td>
 
+            @for (dia of dias(); track dia) {
+            <td class="text-center cursor-pointer" (click)="toggleAsistencia(alumno.id, dia)">
+              <input type="checkbox" class="checkbox checkbox-success pointer-events-none" [checked]="isAsistio(alumno.id, dia)" />
+            </td>
+            }
+
+            <td>
+              <input type="text" placeholder="Observación..." class="input input-bordered input-sm w-full" [value]="observacion(alumno.id)" (input)="setObservacion(alumno.id, $any($event.target).value)" />
+            </td>
+          </tr>
+          }
+        </tbody>
       </table>
     </div>
+    }
 
   </div>
-
 </div>

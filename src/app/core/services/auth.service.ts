@@ -2,9 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
 
 import { environment } from '../../../environments/environment';
 import { AuthStore } from './auth.store';
+
+export interface IUserPayload {
+  id: number;
+  username: string;
+  tokenVersion: number; // Guardamos la tokenVersion utilizado cuando cierra sesion.
+  rolId: number; // ID del rol del usuario (opcional, solo si quieres manejar roles)
+  role: string; // Nombre del rol del usuario (opcional, solo si quieres manejar roles)
+  grupoId?: number; // ID del grupo que el profesor va a tomar asistencia (opcional, solo para profesores)
+}
 
 @Injectable({
   providedIn: 'root',
@@ -20,9 +30,9 @@ export class AuthService {
     private authStore: AuthStore
   ) {}
 
-  login(email: string, password: string) {
+  login(username: string, password: string) {
     return this.http
-      .post<any>(`${this.API_URL}/api/auth/login`, { email, password })
+      .post<any>(`${this.API_URL}/api/auth/login`, { username, password })
       .pipe(
         tap((response) => {
           this.storeTokens(response.accessToken, response.refreshToken);
@@ -80,5 +90,23 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.getAccessToken();
+  }
+
+  decodeAccessToken(token: string): IUserPayload | null {
+    try {
+      return jwtDecode(token) as IUserPayload;
+    } catch (error) {
+      console.error("Error al decodificar el token de acceso:", error);
+      return null;
+    }
+  }
+
+  decodeRefreshToken(token: string): IUserPayload | null {
+    try {
+      return jwtDecode(token) as IUserPayload;
+    } catch (error) {
+      console.error("Error al decodificar el token de refresco:", error);
+      return null;
+    }
   }
 }
