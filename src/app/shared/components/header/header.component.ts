@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -6,15 +6,29 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [],
   templateUrl: './header.component.html',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   private authService = inject(AuthService);
+
+  ngOnInit() {
+    this.loadTheme();
+  }
+
+  private loadTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } else {
+      // Por defecto 'light'
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  }
 
   toggleTheme() {
     const html = document.documentElement;
-    html.setAttribute(
-      'data-theme',
-      html.getAttribute('data-theme') === 'light' ? 'dark' : 'light'
-    );
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
   }
 
   logout() {

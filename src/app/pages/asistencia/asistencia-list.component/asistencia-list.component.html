@@ -9,13 +9,8 @@
         <label class="label">
           <span class="label-text">Fecha</span>
         </label>
-        <input
-          type="date"
-          class="input input-bordered w-full"
-          [value]="selectedDate()"
-          (input)="onFechaInput($any($event.target).value)"
-          (change)="seleccionarFecha($any($event.target).value)"
-        />
+        <input type="date" class="input input-bordered w-full" [value]="selectedDate()"
+          (input)="onFechaInput($any($event.target).value)" (change)="seleccionarFecha($any($event.target).value)" />
       </div>
       <div class="flex justify-center md:justify-end">
         <button class="btn btn-primary min-w-[12rem]" (click)="cargarAsistencia()" [disabled]="!selectedDate()">
@@ -27,7 +22,7 @@
           <span class="label-text-alt">Nota: Solo se acepta el día actual</span>
         </label>
         <p class="text-md opacity-50 mt-2">
-          <br/>
+          <br />
           * Estimado usuario,
 
           Le informamos que la lista de asistencia únicamente puede ser modificada el mismo día en que se registra. Una
