@@ -19,7 +19,13 @@ export class AuthLayoutComponent {
   loginError = signal<string | null>(null);
 
   form = this.fb.group({
-    username: ['', Validators.required],
+    username: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^\S+$/)
+      ]
+    ],
     password: ['', Validators.required],
   });
 
