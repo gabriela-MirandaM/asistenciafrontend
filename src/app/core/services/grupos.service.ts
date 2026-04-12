@@ -15,4 +15,8 @@ export class GruposService {
   getGrupoPorId(grupoId: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/api/grupos/${grupoId}`);
   }
+
+  guardarAsistencia(grupoId: string, data: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/api/grupos/${grupoId}/asistencia`, data);
+  }
 }

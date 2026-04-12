@@ -1,6 +1,9 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CentrosEscolaresService } from '../../../core/services/centros-escolares.service';
+import { GruposService } from '../../../core/services/grupos.service';
 import { AuthStore } from '../../../core/services/auth.store';
+import { LoadingService } from '../../../core/services/loading.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-asistencia-list',
@@ -9,7 +12,10 @@ import { AuthStore } from '../../../core/services/auth.store';
 })
 export class AsistenciaListComponent implements OnInit {
   private service = inject(CentrosEscolaresService);
+  private gruposService = inject(GruposService);
   private authStore = inject(AuthStore);
+  loadingService = inject(LoadingService);
+  private notificationService = inject(NotificationService);
 
   alumnos = signal<any[]>([]);
   dias = signal<string[]>([]);
@@ -22,40 +28,86 @@ export class AsistenciaListComponent implements OnInit {
   selectedGrupoNombre = signal<string>('');
 
   fechaActual = signal(this.formatDate(new Date()));
+  selectedDate = signal<string>('');
 
-  loading = signal(false);
-  error = signal<string | null>(null);
+  step = signal<'select-date' | 'list'>('select-date');
 
   ngOnInit() {
-    this.dias.set([this.fechaActual()]);
     this.initializeProfesorContext();
   }
 
   private initializeProfesorContext() {
     const token = this.authStore.getAccessToken();
     if (!token) {
-      this.error.set('No se encontró sesión activa.');
+      this.notificationService.show('error', 'No se encontró sesión activa.');
       return;
     }
 
     const payload = this.decodeJwtPayload(token);
-    const centroId = payload?.centroId ?? payload?.id_centro ?? payload?.centro?.id;
     const grupoId = payload?.grupoId ?? payload?.id_grupo ?? payload?.grupo?.id;
     const centroNombre = payload?.centroNombre ?? payload?.nombre_centro ?? payload?.centro?.nombre;
     const grupoNombre = payload?.grupoNombre ?? payload?.nombre_grupo ?? payload?.grupo?.nombre;
 
-    if (!centroId || !grupoId) {
-      this.error.set('No se pudo determinar el centro o grupo del profesor.');
+    if (!grupoId) {
+      this.notificationService.show('error', 'No se pudo determinar el grupo del profesor.');
       return;
     }
 
-    this.selectedCentroId.set(String(centroId));
     this.selectedGrupoId.set(Number(grupoId));
     this.selectedCentroNombre.set(centroNombre ?? 'Centro asignado');
     this.selectedGrupoNombre.set(grupoNombre ?? 'Grupo asignado');
 
-    this.loadAlumnos(Number(grupoId));
+    this.loadGrupoInfo(String(grupoId));
+  }
+
+  private loadGrupoInfo(grupoId: string) {
+    this.gruposService.getGrupoPorId(grupoId).subscribe({
+      next: grupo => {
+        const centro = grupo?.centroEscolar;
+        if (centro) {
+          this.selectedCentroId.set(String(centro.id));
+          this.selectedCentroNombre.set(centro.nombre ?? this.selectedCentroNombre());
+        }
+        this.selectedGrupoNombre.set(grupo?.nombre ?? this.selectedGrupoNombre());
+      },
+      error: () => {
+        this.notificationService.show('error', 'No se pudo cargar la información del grupo asignado.');
+      }
+    });
+  }
+
+  seleccionarFecha(fecha: string) {
+    if (!fecha) {
+      this.notificationService.show('warning', 'Por favor seleccione una fecha.');
+      return;
+    }
+    if (fecha !== this.fechaActual()) {
+      this.notificationService.show('warning', 'Solo se puede registrar asistencia para la fecha actual.');
+      return;
+    }
+    this.selectedDate.set(fecha);
+  }
+
+  cargarAsistencia() {
+    if (!this.selectedDate()) {
+      this.notificationService.show('warning', 'Por favor seleccione una fecha primero.');
+      return;
+    }
+    this.step.set('list');
+    this.loadAlumnos(this.selectedGrupoId()!);
     this.loadAsistencia();
+  }
+
+  volverASeleccionFecha() {
+    this.step.set('select-date');
+    this.selectedDate.set('');
+    this.alumnos.set([]);
+    this.asistencia.set({});
+    this.observaciones.set({});
+  }
+
+  cancelar(): void {
+    this.volverASeleccionFecha();
   }
 
   private decodeJwtPayload(token: string): any {
@@ -77,35 +129,34 @@ export class AsistenciaListComponent implements OnInit {
   }
 
   private loadAlumnos(grupoId: number) {
-    this.loading.set(true);
     this.service.getAlumnosPorGrupo(String(grupoId)).subscribe({
       next: alumnos => {
         this.alumnos.set(alumnos ?? []);
-        this.loading.set(false);
       },
       error: () => {
-        this.loading.set(false);
-        this.error.set('No se pudieron cargar los alumnos del grupo');
+        this.notificationService.show('error', 'No se pudieron cargar los alumnos del grupo');
       }
     });
   }
 
   private loadAsistencia() {
-    const centroId = this.selectedCentroId();
-    if (!centroId) {
+    if (!this.selectedDate()) {
       return;
     }
 
-    this.loading.set(true);
-    const fecha = this.fechaActual();
+    const fecha = this.selectedDate();
+    const centroId = this.selectedCentroId();
+    if (!centroId) {
+      this.notificationService.show('error', 'No se encontró el centro escolar asignado.');
+      return;
+    }
+
     this.service.getAsistenciasPorCentro(centroId, fecha, fecha).subscribe({
       next: entries => {
         this.mapAsistencias(entries ?? []);
-        this.loading.set(false);
       },
       error: () => {
-        this.loading.set(false);
-        this.error.set('No se pudieron cargar las asistencias');
+        this.notificationService.show('error', 'No se pudieron cargar las asistencias');
       }
     });
   }
@@ -190,18 +241,44 @@ export class AsistenciaListComponent implements OnInit {
   }
 
   guardar(): void {
-    console.log('Guardar asistencia no implementado: usa el backend si existe un endpoint POST');
-  }
+    const grupoId = this.selectedGrupoId();
+    const fecha = this.selectedDate();
+    if (!grupoId || !fecha) {
+      return;
+    }
 
-  cancelar(): void {
-    this.selectedCentroId.set(null);
-    this.selectedCentroNombre.set('');
-    this.selectedGrupoId.set(null);
-    this.selectedGrupoNombre.set('');
-    this.alumnos.set([]);
-    this.asistencia.set({});
-    this.observaciones.set({});
-    this.error.set(null);
+    this.loadingService.show();
+
+    // Construir el payload según lo esperado por el backend
+    const payload = {
+      fecha: fecha,
+      alumnos: this.alumnos().map(alumno => ({
+        consentimiento: alumno.consentimiento ?? true,
+        id: String(alumno.id),
+        nombre: alumno.nombre ?? '',
+        apellido: alumno.apellido ?? '',
+        documento: alumno.documento ?? '',
+        fechaEliminacion: alumno.fechaEliminacion ?? null,
+        asistio: this.isAsistio(alumno.id, fecha),
+        observaciones: this.observacion(alumno.id) || null
+      }))
+    };
+
+    this.gruposService.guardarAsistencia(String(grupoId), payload).subscribe({
+      next: () => {
+        this.loadingService.hide();
+        this.notificationService.show('success', 'Asistencia guardada exitosamente');
+        // Limpiar y volver al selector de fecha
+        setTimeout(() => {
+          this.volverASeleccionFecha();
+        }, 1000);
+      },
+      error: (err) => {
+        this.loadingService.hide();
+        console.error('Error al guardar asistencia:', err);
+        this.notificationService.show('error', 'Error al guardar la asistencia. Intente nuevamente.');
+      }
+    });
   }
 
   private formatDate(date: Date): string {

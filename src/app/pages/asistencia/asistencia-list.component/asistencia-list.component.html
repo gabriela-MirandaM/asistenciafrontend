@@ -14,14 +14,25 @@
     </div>
   </div>
 
-  @if (loading()) {
-  <div class="alert alert-info mb-4">Cargando datos de asistencia...</div>
+  @if (step() === 'select-date') {
+  <div class="card bg-base-100 shadow-xl p-6 max-w-md mx-auto">
+    <h3 class="text-lg font-semibold mb-4">Seleccionar Fecha de Asistencia</h3>
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Fecha</span>
+      </label>
+      <input type="date" class="input input-bordered" (change)="seleccionarFecha($any($event.target).value)" />
+      <label class="label">
+        <span class="label-text-alt">Solo se permite la fecha actual</span>
+      </label>
+      <button class="btn btn-primary mt-4" (click)="cargarAsistencia()" [disabled]="!selectedDate()">
+        Cargar Asistencia
+      </button>
+    </div>
+  </div>
   }
 
-  @if (error()) {
-  <div class="alert alert-error mb-4">{{ error() }}</div>
-  }
-
+  @if (step() === 'list') {
   <div class="p-6">
 
     <div class="mb-6 flex flex-wrap items-center gap-4">
@@ -31,28 +42,24 @@
           {{ selectedCentroNombre() || 'Centro no seleccionado' }} - {{ selectedGrupoNombre() || 'Grupo no seleccionado' }}
         </p>
         <p class="text-sm font-semibold">
-          Fecha: {{ semanaLabel() }}
+          Fecha: {{ selectedDate() }}
         </p>
       </div>
 
       <div class="ml-auto flex gap-2">
-        <button class="btn btn-primary" (click)="guardar()" [disabled]="!selectedGrupoId()">Guardar</button>
+        <button class="btn btn-outline" (click)="volverASeleccionFecha()">Cambiar Fecha</button>
+        <button class="btn btn-primary" (click)="guardar()" [disabled]="loadingService.isLoading()">Guardar</button>
         <button class="btn btn-outline" (click)="cancelar()">Cancelar</button>
       </div>
     </div>
 
-    @if (selectedGrupoId()) {
     <div class="overflow-x-auto rounded-box border border-base-300">
       <table class="table table-zebra table-pin-rows table-pin-cols">
 
         <thead>
           <tr class="bg-base-200">
             <th class="w-64">Alumno</th>
-
-            @for (dia of dias(); track dia) {
-            <th class="text-center">{{ diaLabel(dia) }}</th>
-            }
-
+            <th class="text-center">Asistencia</th>
             <th class="w-72">Observaciones</th>
           </tr>
         </thead>
@@ -60,7 +67,7 @@
         <tbody>
           @if (alumnos().length === 0) {
           <tr>
-            <td [attr.colspan]="dias().length + 2" class="text-center opacity-70">
+            <td colspan="3" class="text-center opacity-70">
               No hay alumnos para este grupo.
             </td>
           </tr>
@@ -69,13 +76,9 @@
           @for (alumno of alumnos(); track alumno.id) {
           <tr>
             <td class="font-medium">{{ alumno.nombre }} {{ alumno.apellido }}</td>
-
-            @for (dia of dias(); track dia) {
-            <td class="text-center cursor-pointer" (click)="toggleAsistencia(alumno.id, dia)">
-              <input type="checkbox" class="checkbox checkbox-success pointer-events-none" [checked]="isAsistio(alumno.id, dia)" />
+            <td class="text-center">
+              <input type="checkbox" class="checkbox checkbox-success" [checked]="isAsistio(alumno.id, selectedDate())" (change)="toggleAsistencia(alumno.id, selectedDate())" />
             </td>
-            }
-
             <td>
               <input type="text" placeholder="Observación..." class="input input-bordered input-sm w-full" [value]="observacion(alumno.id)" (input)="setObservacion(alumno.id, $any($event.target).value)" />
             </td>
@@ -84,7 +87,17 @@
         </tbody>
       </table>
     </div>
-    }
 
   </div>
+  }
+
 </div>
+
+@if (loadingService.isLoading()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+    <div class="loading loading-spinner loading-lg mb-4"></div>
+    <p>Procesando...</p>
+  </div>
+</div>
+}
