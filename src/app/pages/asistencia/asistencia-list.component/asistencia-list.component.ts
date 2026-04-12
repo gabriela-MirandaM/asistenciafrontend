@@ -78,14 +78,20 @@ export class AsistenciaListComponent implements OnInit {
 
   seleccionarFecha(fecha: string) {
     if (!fecha) {
+      this.selectedDate.set('');
       this.notificationService.show('warning', 'Por favor seleccione una fecha.');
       return;
     }
     if (fecha !== this.fechaActual()) {
+      this.selectedDate.set('');
       this.notificationService.show('warning', 'Solo se puede registrar asistencia para la fecha actual.');
       return;
     }
     this.selectedDate.set(fecha);
+  }
+
+  onFechaInput(fecha: string) {
+    this.selectedDate.set(fecha || '');
   }
 
   cargarAsistencia() {
@@ -153,7 +159,10 @@ export class AsistenciaListComponent implements OnInit {
 
     alumnos.forEach(alumno => {
       const alumnoId = Number(alumno.id);
-      const asistio = alumno.asistio ?? false;
+      let asistio = alumno.asistio;
+      if (typeof asistio === 'string') {
+        asistio = asistio.toLowerCase() === 'true';
+      }
       const observacion = alumno.observaciones ?? '';
 
       if (alumnoId && fecha) {
