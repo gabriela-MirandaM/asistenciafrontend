@@ -62,6 +62,7 @@
       </div>
 
       <div class="ml-auto flex gap-2">
+        <button class="btn btn-secondary" (click)="seleccionarTodos()" [disabled]="loadingService.isLoading() || alumnos().length === 0">Seleccionar todos</button>
         <button class="btn btn-primary" (click)="guardar()" [disabled]="loadingService.isLoading()">Guardar</button>
         <button class="btn btn-outline" (click)="cancelar()">Cancelar</button>
       </div>

@@ -196,6 +196,27 @@ export class AsistenciaListComponent implements OnInit {
     });
   }
 
+  seleccionarTodos(): void {
+    const fecha = this.selectedDate();
+    if (!fecha) {
+      return;
+    }
+
+    this.asistencia.update(state => {
+      const updatedState = { ...state };
+      this.alumnos().forEach(alumno => {
+        const alumnoId = Number(alumno.id);
+        if (!Number.isNaN(alumnoId)) {
+          updatedState[alumnoId] = {
+            ...(updatedState[alumnoId] ?? {}),
+            [fecha]: true
+          };
+        }
+      });
+      return updatedState;
+    });
+  }
+
   observacion(alumnoId: number): string {
     return this.observaciones()[alumnoId] ?? '';
   }

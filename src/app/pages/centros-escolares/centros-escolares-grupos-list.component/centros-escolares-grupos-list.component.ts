@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CentrosEscolaresService } from '../../../core/services/centros-escolares.service';
 import { GruposService } from '../../../core/services/grupos.service';
 
@@ -10,6 +10,7 @@ import { GruposService } from '../../../core/services/grupos.service';
 })
 export class CentrosEscolaresGruposListComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private service = inject(CentrosEscolaresService);
   private gruposService = inject(GruposService);
 
@@ -217,6 +218,10 @@ export class CentrosEscolaresGruposListComponent implements OnInit {
         this.error.set('No se pudo cargar los detalles del grupo');
       }
     });
+  }
+
+  volverACentrosEscolares(): void {
+    this.router.navigate(['/centros-escolares']);
   }
 
   setFechaInicio(value: string) {

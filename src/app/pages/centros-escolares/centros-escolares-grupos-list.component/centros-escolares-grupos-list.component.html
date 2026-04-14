@@ -1,10 +1,16 @@
 <div class="p-6">
 
   <!-- Header -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold">Grupos</h1>
+  <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">Grupos</h1>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-outline btn-sm" type="button" (click)="volverACentrosEscolares()">Regresar a centros escolares</button>
+    </div>
+  </div>
 
-    @if (centroSeleccionado()) {
+  @if (centroSeleccionado()) {
     <div class="space-y-1 text-sm opacity-70">
       <div><span class="font-semibold">Centro Escolar:</span> {{ centroSeleccionado()?.nombre }}</div>
       @if (centroSeleccionado()?.codigo) {
@@ -23,7 +29,6 @@
     } @else {
     <p class="text-sm opacity-70">Seleccione un grupo para ver los datos del centro escolar.</p>
     }
-  </div>
 
   @if (loading()) {
   <div class="alert alert-info mb-4">Cargando grupos y asistencias...</div>
@@ -37,7 +42,7 @@
   <div class="alert alert-warning mb-4">No se encontraron grupos para este centro.</div>
   }
 
-  @if (!loading() && !error() && grupos().length > 0) {
+  @if (!loading() && !error() && grupos().length > 0 && centroSeleccionado()) {
   <div class="mb-6 rounded-box border border-base-300 bg-base-100 p-4">
     <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 items-end">
       <div>
